@@ -1,16 +1,38 @@
-<!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
         <title>TODO supply a title</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="bower_components/datatables.net-dt/css/jquery.dataTables.css" rel="stylesheet" type="text/css"/>
+        <link href="bower_components/datatables.net-buttons-dt/css/buttons.dataTables.css" rel="stylesheet" type="text/css"/>
+        <link href="css/main.css" rel="stylesheet" type="text/css"/>
+        <script src="bower_components/jquery/dist/jquery.js" type="text/javascript"></script>
+        <script src="bower_components/lodash/lodash.js" type="text/javascript"></script>
+        <script src="bower_components/datatables.net/js/jquery.dataTables.js" type="text/javascript"></script>
+        <script src="bower_components/datatables.net-buttons/js/dataTables.buttons.js" type="text/javascript"></script>
+        <script src="bower_components/datatables.net-buttons/js/buttons.print.js" type="text/javascript"></script>
+        <script src="bower_components/datatables.net-buttons/js/buttons.flash.js" type="text/javascript"></script>
+        <script src="bower_components/datatables.net-buttons/js/buttons.html5.js" type="text/javascript"></script>
+        <script src="bower_components/datatables.net-buttons/js/buttons.colVis.js" type="text/javascript"></script>
+        <script src="js/main.js" type="text/javascript"></script>
     </head>
     <body>
-        <div>TODO write content</div>
+        <h1>Ejemplo de DataTables/</h1>
+        <table id="personas">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            var personas = new Personas();
+            personas.iniciar();
+        </script>
     </body>
 </html>
