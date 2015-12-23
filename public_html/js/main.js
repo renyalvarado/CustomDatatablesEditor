@@ -24,9 +24,15 @@ var Personas = (function () {
         return personaForm;
     };
 
+    var getClosest$TR = function (event) {
+        var $target = $(event.target);
+        var $tr = $target.closest('tr');
+        return $tr;
+    };
+
     var Personas = function (dataSet, slPersonas) {
         var that = this;
-        this.$nuevaPersona = null;
+        this.hayNuevo = false;
         var txtBtnGuardar = tplBtn({tipo: 'guardar'});
         var txtBtnCancelar = tplBtn({tipo: 'cancelar'});
         var txtBtnEditar = tplBtn({tipo: 'editar'});
@@ -73,14 +79,14 @@ var Personas = (function () {
             buttons: [{
                     text: 'Nuevo',
                     action: function (e, dt, node, config) {
-                        if (_.isNull(that.$nuevaPersona)) {
-                            var newNode = dt.row.add({
+                        if (that.hayNuevo) {
+                            alert('Sólo puede agregar una persona a la vez');
+                        } else {
+                            dt.row.add({
                                 nombre: null,
                                 apellido: null
-                            }).draw().node();
-                            that.$nuevaPersona = $(newNode);
-                        } else {
-                            alert('Sólo puede agregar una persona a la vez');
+                            }).draw();
+                            that.hayNuevo = true;
                         }
                     }
                 }
@@ -95,20 +101,22 @@ var Personas = (function () {
         var slGuardar = '.guardar';
         var slCancelar = '.cancelar';
         this.$personas.off(evento, slGuardar).on(evento, slGuardar, function (event) {
-            var $target = $(event.target);
-            var $tr = $target.closest('tr');
+            var $tr = getClosest$TR(event);
             $tr.removeClass('nuevo');
             var personaForm = getPersonaForm($tr);
             if (esPersonaValida(personaForm)) {
                 this.dtPersonas.row($tr).data(personaForm);
-                this.$nuevaPersona = null;
+                this.hayNuevo = false;
                 this.dtPersonas.draw();
             } else {
                 alert('Los datos de la persona deben estar completos');
             }
         }.bind(this));
         this.$personas.off(evento, slCancelar).on(evento, slCancelar, function (event) {
-        });
+            var $tr = getClosest$TR(event);
+            this.dtPersonas.row($tr).remove().draw();
+            this.hayNuevo = false;
+        }.bind(this));
     };
     return Personas;
 })();
