@@ -31,8 +31,9 @@
             </tbody>
         </table>
         <script type="text/javascript">
-            var personas = new Personas();
-            personas.iniciar();
+            $.getJSON('personas.json', function (dataSet) {
+                var personas = new Personas(dataSet, '#personas');
+            });
         </script>
     </body>
 </html>
