@@ -101,6 +101,7 @@ var Personas = (function () {
         var slGuardar = '.guardar';
         var slCancelar = '.cancelar';
         var slEditar = '.editar';
+        var slEliminar = '.eliminar';
         this.$personas.off(evento, slGuardar).on(evento, slGuardar, function (event) {
             var $tr = getClosest$TR(event);
             var personaForm = getPersonaForm($tr);
@@ -117,6 +118,13 @@ var Personas = (function () {
             var $tr = getClosest$TR(event);
             this.dtPersonas.row($tr).remove().draw();
             this.editando = false;
+        }.bind(this));
+        this.$personas.off(evento, slEliminar).on(evento, slEliminar, function (event) {
+            var $tr = getClosest$TR(event);
+            if (window.confirm("¿Desea eliminar el registro?")) {
+                this.dtPersonas.row($tr).remove().draw();
+                this.editando = false;
+            }
         }.bind(this));
         this.$personas.off(evento, slEditar).on(evento, slEditar, function (event) {
             var $tr = getClosest$TR(event);
