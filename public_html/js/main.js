@@ -2,8 +2,16 @@
 var Personas = (function () {
     var strBtn = '<button class="btn btn-mini btn-primary pull-right <%= tipo %>"><%= _.capitalize(tipo) %></button>';
     var strInput = '<input class="<%= clase %>" value="<%= valor %>" type="<%= tipo %>">';
+    var strSelect = '<select class="<%= clase %>">' +
+                        '<% _.each(col, function(e) { %> ' +
+                            '<option value="<%= e.value %>" <%= (e.value === seleccionado) ? "selected" : "" %>>' +
+                                '<%= e.label %>' +
+                            '</option>' +
+                        '<% }); %>' +
+                    '</select>';
     var tplBtn = _.template(strBtn);
     var tplInput = _.template(strInput);
+    var tplSelect = _.template(strSelect);
 
     var esNuevaPersona = function (persona) {
         return (_.isUndefined(persona.nombre) || _.isNull(persona.nombre));
@@ -17,9 +25,11 @@ var Personas = (function () {
     var getPersonaForm = function ($tr) {
         var nombre = $tr.find('.nombre').val();
         var apellido = $tr.find('.apellido').val();
+        var genero = $tr.find('.genero').val();
         var personaForm = {
             nombre: nombre,
-            apellido: apellido
+            apellido: apellido,
+            genero: genero
         };
         return personaForm;
     };
@@ -35,6 +45,13 @@ var Personas = (function () {
     };
 
     var Personas = function (dataSet, slPersonas) {
+        var generos = [{
+                value: 'M',
+                label: 'Masculino'
+            }, {
+                value: 'F',
+                label: 'Femenino'
+            }];
         var that = this;
         this.editando = false;
         var txtBtnGuardar = tplBtn({tipo: 'guardar'});
@@ -65,6 +82,16 @@ var Personas = (function () {
                         }
                     }
                 }, {
+                    data: 'genero',
+                    render: function (data, type, persona, meta) {
+                        if (esNuevaPersona(persona) || (that.editando)) {
+                            return tplSelect({clase: 'genero', col: generos, seleccionado: persona.genero});
+                        } else {
+                            var genero = _.find(generos, {value: persona.genero});
+                            return genero.label;
+                        }
+                    }
+                }, {
                     className: 'edicion',
                     render: function (data, type, persona, meta) {
                         if (esNuevaPersona(persona) || (that.editando)) {
@@ -85,7 +112,8 @@ var Personas = (function () {
                     action: function (e, dt, node, config) {
                         dt.row.add({
                             nombre: null,
-                            apellido: null
+                            apellido: null,
+                            genero: null
                         }).draw();
                         that.editado = true;
                     }

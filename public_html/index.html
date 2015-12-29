@@ -23,17 +23,21 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Apellido</th>
+                    <th>Género</th>
                     <th>Opciones</th>
                 </tr>
             </thead>
             <tbody>
-
             </tbody>
         </table>
+        <span id="contGenero"></span>
         <script type="text/javascript">
-            $.getJSON('personas.json', function (dataSet) {
-                var personas = new Personas(dataSet, '#personas');
+            $(document).ready(function() {
+                $.getJSON('personas.json', function (dataSet) {
+                    var personas = new Personas(dataSet, '#personas');
+                });
             });
+
         </script>
     </body>
 </html>

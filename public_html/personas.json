@@ -1,7 +1,9 @@
 [{
         "nombre": "Reny",
-        "apellido": "Alvarado"
+        "apellido": "Alvarado",
+        "genero": "M"
     }, {
         "nombre": "Omar",
-        "apellido": "Riera"
+        "apellido": "Riera",
+        "genero": "M"
     }]
