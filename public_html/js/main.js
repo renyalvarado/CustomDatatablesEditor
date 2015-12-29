@@ -1,8 +1,10 @@
 /* global _ */
 var Personas = (function () {
+    var noInput = 0;
     var strBtn = '<button class="btn btn-mini btn-primary pull-right <%= tipo %>"><%= _.capitalize(tipo) %></button>';
-    var strInput = '<input class="<%= clase %>" value="<%= valor %>" type="<%= tipo %>">';
-    var strSelect = '<select class="<%= clase %>">' +
+    var strInput = '<input name="input-<%= noInput %>" class="<%= clase %>" value="<%= valor %>" type="<%= tipo %>" data-rule-required="true">';
+    var strSelect = '<select name="select-<%= noInput %>" class="<%= clase %>" data-rule-required="true">' +
+                        '<option></option>' +
                         '<% _.each(col, function(e) { %> ' +
                             '<option value="<%= e.value %>" <%= (e.value === seleccionado) ? "selected" : "" %>>' +
                                 '<%= e.label %>' +
@@ -13,13 +15,20 @@ var Personas = (function () {
     var tplInput = _.template(strInput);
     var tplSelect = _.template(strSelect);
 
-    var esNuevaPersona = function (persona) {
-        return (_.isUndefined(persona.nombre) || _.isNull(persona.nombre));
+    var crearInput = function(infoInput) {
+        noInput++;
+        infoInput.noInput = noInput;
+        return tplInput(infoInput);
+    };
+    
+    var crearSelect = function(infoInput) {
+        noInput++;
+        infoInput.noInput = noInput;
+        return tplSelect(infoInput);
     };
 
-    var esPersonaValida = function (persona) {
-        return !(_.isUndefined(persona.nombre) || _.isNull(persona.nombre) || (persona.nombre === ''))
-                && !(_.isUndefined(persona.apellido) || _.isNull(persona.apellido) || (persona.apellido === ''));
+    var esNuevaPersona = function (persona) {
+        return (_.isUndefined(persona.nombre) || _.isNull(persona.nombre));
     };
 
     var getPersonaForm = function ($tr) {
@@ -62,13 +71,15 @@ var Personas = (function () {
         var txtBotonesEditar = txtBtnEditar + txtBtnEliminar;
         this.editando = false;
         this.$personas = $(slPersonas);
+        this.$formPersonas = this.$personas.closest('form');
+        this.$formPersonas.validate();
         this.dtPersonas = this.$personas.DataTable({
             data: dataSet,
             columns: [{
                     data: 'nombre',
                     render: function (data, type, persona, meta) {
                         if (esNuevaPersona(persona) || (that.editando)) {
-                            return tplInput({clase: 'nombre', valor: persona.nombre, tipo: 'text'});
+                            return crearInput({clase: 'nombre', valor: persona.nombre, tipo: 'text'});
                         } else {
                             return persona.nombre;
                         }
@@ -77,7 +88,7 @@ var Personas = (function () {
                     data: 'apellido',
                     render: function (data, type, persona, meta) {
                         if (esNuevaPersona(persona) || (that.editando)) {
-                            return tplInput({clase: 'apellido', valor: persona.apellido, tipo: 'text'});
+                            return crearInput({clase: 'apellido', valor: persona.apellido, tipo: 'text'});
                         } else {
                             return persona.apellido;
                         }
@@ -86,7 +97,7 @@ var Personas = (function () {
                     data: 'genero',
                     render: function (data, type, persona, meta) {
                         if (esNuevaPersona(persona) || (that.editando)) {
-                            return tplSelect({clase: 'genero', col: generos, seleccionado: persona.genero});
+                            return crearSelect({clase: 'genero', col: generos, seleccionado: persona.genero});
                         } else {
                             var genero = _.find(generos, {value: persona.genero});
                             return genero.label;
@@ -111,12 +122,14 @@ var Personas = (function () {
             buttons: [{
                     text: 'Nuevo',
                     action: function (e, dt, node, config) {
-                        dt.row.add({
-                            nombre: null,
-                            apellido: null,
-                            genero: null
-                        }).draw();
-                        that.editado = true;
+                        if (!that.editando) {
+                            dt.row.add({
+                                nombre: null,
+                                apellido: null,
+                                genero: null
+                            }).draw();
+                            that.editando = true;   
+                        }
                     }
                 }
 
@@ -133,15 +146,15 @@ var Personas = (function () {
         var slEliminar = '.eliminar';
         this.$personas.off(evento, slGuardar).on(evento, slGuardar, function (event) {
             var $tr = getClosest$TR(event);
-            var personaForm = getPersonaForm($tr);
-            if (esPersonaValida(personaForm)) {
+            var valido = this.$formPersonas.valid();
+            if (valido) {
+                var personaForm = getPersonaForm($tr);
                 this.editando = false;
                 this.dtPersonas.row($tr).data(personaForm);
                 $tr.removeClass('nuevo');
                 this.dtPersonas.draw();
-            } else {
-                alert('Los datos de la persona deben estar completos');
             }
+            return false;
         }.bind(this));
         this.$personas.off(evento, slCancelar).on(evento, slCancelar, function (event) {
             var $tr = getClosest$TR(event);
@@ -155,19 +168,23 @@ var Personas = (function () {
                 this.editando = false;
                 cells.invalidate().draw();
             }
+            return false;
         }.bind(this));
         this.$personas.off(evento, slEliminar).on(evento, slEliminar, function (event) {
             var $tr = getClosest$TR(event);
             if (window.confirm("¿Desea eliminar el registro?")) {
                 this.dtPersonas.row($tr).remove().draw();
-                this.editando = false;
             }
+            return false;
         }.bind(this));
         this.$personas.off(evento, slEditar).on(evento, slEditar, function (event) {
-            var $tr = getClosest$TR(event);
-            var cells = this.dtPersonas.cells($tr.find('td'));
-            this.editando = true;
-            cells.invalidate().draw();
+            if (!this.editando) {
+                var $tr = getClosest$TR(event);
+                var cells = this.dtPersonas.cells($tr.find('td'));
+                this.editando = true;
+                cells.invalidate().draw();
+            }
+            return false;
         }.bind(this));
     };
     return Personas;
