@@ -44,22 +44,23 @@ var Personas = (function () {
         return getClosest(event, 'tr');
     };
 
+    var generos = [{
+            value: 'M',
+            label: 'Masculino'
+        }, {
+            value: 'F',
+            label: 'Femenino'
+        }];
+
     var Personas = function (dataSet, slPersonas) {
-        var generos = [{
-                value: 'M',
-                label: 'Masculino'
-            }, {
-                value: 'F',
-                label: 'Femenino'
-            }];
         var that = this;
-        this.editando = false;
         var txtBtnGuardar = tplBtn({tipo: 'guardar'});
         var txtBtnCancelar = tplBtn({tipo: 'cancelar'});
         var txtBtnEditar = tplBtn({tipo: 'editar'});
         var txtBtnEliminar = tplBtn({tipo: 'eliminar'});
         var txtBotonesNuevo = txtBtnGuardar + txtBtnCancelar;
         var txtBotonesEditar = txtBtnEditar + txtBtnEliminar;
+        this.editando = false;
         this.$personas = $(slPersonas);
         this.dtPersonas = this.$personas.DataTable({
             data: dataSet,
@@ -144,8 +145,16 @@ var Personas = (function () {
         }.bind(this));
         this.$personas.off(evento, slCancelar).on(evento, slCancelar, function (event) {
             var $tr = getClosest$TR(event);
-            this.dtPersonas.row($tr).remove().draw();
-            this.editando = false;
+            var row = this.dtPersonas.row($tr);
+            var persona = row.data();
+            if (esNuevaPersona(persona)) {
+                row.remove().draw();
+                this.editando = false;
+            } else {
+                var cells = this.dtPersonas.cells($tr.find('td'));
+                this.editando = false;
+                cells.invalidate().draw();
+            }
         }.bind(this));
         this.$personas.off(evento, slEliminar).on(evento, slEliminar, function (event) {
             var $tr = getClosest$TR(event);
