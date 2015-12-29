@@ -15,13 +15,13 @@ var Personas = (function () {
     var tplInput = _.template(strInput);
     var tplSelect = _.template(strSelect);
 
-    var crearInput = function(infoInput) {
+    var crearInput = function (infoInput) {
         noInput++;
         infoInput.noInput = noInput;
         return tplInput(infoInput);
     };
-    
-    var crearSelect = function(infoInput) {
+
+    var crearSelect = function (infoInput) {
         noInput++;
         infoInput.noInput = noInput;
         return tplSelect(infoInput);
@@ -128,12 +128,15 @@ var Personas = (function () {
                                 apellido: null,
                                 genero: null
                             }).draw();
-                            that.editando = true;   
+                            that.editando = true;
                         }
                     }
-                }
-
-            ]
+                }, {
+                    text: 'Mostrar Data',
+                    action: function (e, dt, node, config) {
+                        console.table(dt.data());
+                    }
+                }]
         });
         this.iniciarEventos();
     };
